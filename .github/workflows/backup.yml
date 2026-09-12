@@ -1,0 +1,39 @@
+name: Daily Supabase Backup
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Install rclone
+        run: curl https://rclone.org/install.sh | sudo bash
+
+      - name: Set up rclone config
+        run: |
+          mkdir -p ~/.config/rclone
+          echo "${{ secrets.RCLONE_CONF }}" > ~/.config/rclone/rclone.conf
+
+      - name: Dump database
+        run: |
+          pg_dump "${{ secrets.SUPABASE_DB_URL }}" \
+            --no-owner --no-privileges \
+            -f backup.sql
+          gzip backup.sql
+
+      - name: Rename with date
+        run: mv backup.sql.gz "backup_$(date +%F).sql.gz"
+
+      - name: Upload to Google Drive
+        run: |
+          rclone copy backup_*.sql.gz backupdrive:supabase-backups/
+
+      - name: Clean up old backups (older than 14 days)
+        run: |
+          rclone delete backupdrive:supabase-backups/ --min-age 14d
