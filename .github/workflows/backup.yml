@@ -20,7 +20,7 @@ jobs:
         run: curl https://rclone.org/install.sh | sudo bash
 
       - name: Set up rclone config
-       env:
+        env:
           RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
         run: |
           mkdir -p ~/.config/rclone
