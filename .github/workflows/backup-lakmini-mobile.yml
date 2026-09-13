@@ -39,8 +39,8 @@ jobs:
 
       - name: Upload to Google Drive
         run: |
-          rclone copy backup_*.sql.gz backupdrive:supabase-backups/
+          rclone copy backup_*.sql.gz backupdrive:supabase-backups/lakmini-mobile/
 
       - name: Clean up old backups (older than 14 days)
         run: |
-          rclone delete backupdrive:supabase-backups/ --min-age 14d
+          rclone delete backupdrive:supabase-backups/lakmini-mobile/ --min-age 14d
