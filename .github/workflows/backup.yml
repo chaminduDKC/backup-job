@@ -30,6 +30,7 @@ jobs:
         run: |
           /usr/lib/postgresql/17/bin/pg_dump "${{ secrets.SUPABASE_DB_URL }}" \
             --no-owner --no-privileges \
+            --schema=public \
             -f backup.sql
           gzip backup.sql
 
